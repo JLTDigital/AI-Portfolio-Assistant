@@ -4,7 +4,7 @@ High-level features in rough build order. Run `/feature` to spec the next unchec
 
 ## Your features
 
-- [ ] 1. **Knowledge base loader** - Read every markdown file in `content/` with its front matter, combine them into one context, and warn at build time if it exceeds the token budget.
+- [x] 1. **Knowledge base loader** - Read every markdown file in `content/` with its front matter, combine them into one context, and warn at build time if it exceeds the token budget.
 - [ ] 2. **Agent persona & grounding** - A system prompt that makes Agent speak about Jonathan in the third person, answer only from the knowledge base, and handle salary, right-to-work and unknown questions as agreed.
 - [ ] 3. **Chat API route** - A server-side `/api/chat` endpoint that streams answers from Gemini using the combined context and recent conversation turns.
 - [ ] 4. **Provider fallback chain** - Retry on Groq, then OpenRouter, when the primary provider rate-limits, errors or times out.

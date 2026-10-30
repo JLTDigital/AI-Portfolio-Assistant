@@ -45,9 +45,12 @@ and the `@/*` import alias maps to the root.
 
 - Pages: `app/[route]/page.tsx`
 - Static assets: `public/`
+- Server and shared logic: `lib/<area>/`
+- Build-time scripts: `scripts/` (plain `.mjs`, run by Node without a TypeScript step)
+- Knowledge base: `content/*.md`, generated into `lib/knowledge/knowledge.generated.json`
 
-> TODO: no components, actions, types, or lib folders exist yet. Record where
-> they live when the first feature adds one.
+> TODO: no components, actions, or types folders exist yet. Record where they
+> live when the first feature adds one.
 
 ## Naming
 
