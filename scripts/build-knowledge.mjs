@@ -6,6 +6,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const CONTENT_DIR = join(ROOT, "content");
 const OUTPUT_FILE = join(ROOT, "lib", "knowledge", "knowledge.generated.json");
 
+const PERSONA_FILE = "persona.md";
+
 export const TOKEN_BUDGET = 6000;
 
 function parseFrontMatter(raw, file) {
@@ -69,17 +71,25 @@ export function loadKnowledge(contentDir) {
   }
 
   const parsed = names.map((file) => parseKnowledgeFile(contentDir, file));
+  const persona = parsed.find(({ file }) => file === PERSONA_FILE);
+  if (!persona) {
+    throw new Error(`${PERSONA_FILE}: required file is missing`);
+  }
+
   const text = parsed
+    .filter((entry) => entry !== persona)
     .map(
       ({ file, source, last_updated, body }) =>
         `[${file} | source: ${source} | last_updated: ${last_updated}]\n${body}`,
     )
     .join("\n\n");
+  const systemPrompt = `${persona.body}\n\n# Knowledge base\n\n${text}`;
 
   return {
     files: parsed.map(({ file, source, last_updated }) => ({ file, source, last_updated })),
     text,
-    estimatedTokens: Math.ceil(text.length / 4),
+    systemPrompt,
+    estimatedTokens: Math.ceil(systemPrompt.length / 4),
   };
 }
 

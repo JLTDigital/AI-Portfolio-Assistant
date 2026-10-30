@@ -11,6 +11,7 @@ export interface KnowledgeFileMeta {
 export interface KnowledgeContext {
   files: KnowledgeFileMeta[];
   text: string;
+  systemPrompt: string;
   estimatedTokens: number;
 }
 
