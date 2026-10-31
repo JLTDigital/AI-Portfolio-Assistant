@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 
+import { AgentAvatar } from "@/components/agent/AgentAvatar";
+import type { AgentState } from "@/components/agent/AgentAvatar";
 import { MAX_USER_CHARS } from "@/lib/chat/limits";
 
 import { SignalPanel } from "./SignalPanel";
@@ -21,6 +23,12 @@ export function Chat() {
   const answering = status === "thinking" || status === "streaming" || typing;
   const ended = callEnded && !typing;
   const locked = signalLost || ended;
+
+  // Thinking comes first because Retry runs while signalLost is still true.
+  let agentState: AgentState = "idle";
+  if (status === "thinking") agentState = "thinking";
+  else if (status === "streaming" || typing) agentState = "speaking";
+  else if (locked) agentState = "signal-lost";
 
   // The panel takes height from the transcript, so its arrival also scrolls.
   useEffect(() => {
@@ -73,7 +81,9 @@ export function Chat() {
         </h1>
       </div>
 
-      <p aria-hidden="true" className="mt-4 ml-5 text-xs text-alert sm:ml-6">
+      <AgentAvatar state={agentState} />
+
+      <p aria-hidden="true" className="mt-2 ml-5 text-xs text-alert sm:ml-6">
         SECURE_LINK( AgentTransmission )
       </p>
       <div className="relative flex min-h-0 flex-1 pl-3 sm:pl-4">

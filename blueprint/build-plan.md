@@ -13,7 +13,7 @@ High-level features in rough build order. Run `/feature` to spec the next unchec
 - [x] 7. **Chat interface** - A message transcript, an input box and streamed "holo transmission" text, responsive from mobile to desktop.
 - [x] 8. **Suggested questions** - Clickable starter chips that send common recruiter questions.
 - [x] 9. **Scene backdrop** - A near-black CSS backdrop with a faint grid, scanlines and vignette, plus a readability gradient behind the chat.
-- [ ] 10. **Agent blob avatar** - Nyx UI Morphing Blob as Agent, with idle, ringing, thinking, speaking and signal-lost states; loaded in the browser only, with mobile, reduced-motion and no-WebGL fallbacks.
+- [x] 10. **Agent blob avatar** - Nyx UI Morphing Blob as Agent, with idle, ringing, thinking, speaking and signal-lost states; loaded in the browser only, with mobile, reduced-motion and no-WebGL fallbacks.
 - [ ] 11. **Incoming call intro** - Caller card reading "Agent", Accept button, connecting glitch and the Agent blob materialising, before handing off to the chat.
 - [ ] 12. **Intro controls** - A Skip button, a reduced-motion version, and remembering returning visitors so they go straight to the chat.
 - [ ] 13. **End call** - Collapse the call and reset the conversation, then show contact links.
