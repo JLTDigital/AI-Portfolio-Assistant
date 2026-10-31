@@ -103,7 +103,7 @@ Notes:
 - `role` (`user` | `assistant`)
 - `content` (string)
 
-The conversation lives in the browser and is never persisted server-side. `/api/chat` receives only the last few turns.
+The conversation lives in the browser and is never persisted server-side. `/api/chat` receives the transcript, up to 40 messages, and sends only the last 10 to the model.
 
 ### RateLimitCounter (hosted KV, short-lived)
 
@@ -223,4 +223,3 @@ Shown when every provider's allowance is used up, the visitor hits their rate li
 - **Content authoring:** feature 1 reads `content/`, which doesn't exist yet, and no feature writes the knowledge base, `persona.md` or the CV PDF.
 - **Contact details:** no env var or location is defined for the email address or CV PDF used by feature 14.
 - **Health check scope:** the plan makes provider reachability optional; feature 18 makes it required, and probing may spend free quota.
-- **Unset limits:** rate-limit window, max input length, max conversation length and turn count have no values yet. Resolve these in the relevant `/feature` specs.

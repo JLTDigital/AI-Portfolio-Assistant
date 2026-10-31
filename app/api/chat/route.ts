@@ -4,11 +4,15 @@ import { openrouter } from "@openrouter/ai-sdk-provider";
 import { APICallError, RetryError, streamText } from "ai";
 
 import { getKnowledgeContext } from "@/lib/knowledge";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const GOOGLE_MODEL = "gemini-3.5-flash-lite";
 const GROQ_MODEL = "openai/gpt-oss-120b";
 const OPENROUTER_MODEL = "nvidia/nemotron-3.5-super-vl:free";
 const RECENT_MESSAGES = 10;
+const MAX_MESSAGES = 40;
+const MAX_USER_CHARS = 500;
+const MAX_ASSISTANT_CHARS = 4_000;
 const CHAT_TIMEOUT_MS = 30_000;
 const FIRST_TEXT_TIMEOUT_MS = 10_000;
 
@@ -36,7 +40,13 @@ interface ChatMessage {
 }
 
 interface ChatError {
-  error: "invalid_request" | "not_configured" | "provider_error";
+  error:
+    | "invalid_request"
+    | "input_too_long"
+    | "conversation_too_long"
+    | "rate_limited"
+    | "not_configured"
+    | "provider_error";
 }
 
 type StreamParts = AsyncIterator<
@@ -45,29 +55,47 @@ type StreamParts = AsyncIterator<
     : never
 >;
 
-function errorResponse(status: number, error: ChatError["error"]) {
-  return Response.json({ error } satisfies ChatError, { status });
+function errorResponse(
+  status: number,
+  error: ChatError["error"],
+  headers?: HeadersInit,
+) {
+  return Response.json({ error } satisfies ChatError, { status, headers });
 }
 
-/** Rebuilds the messages from an untrusted body, or returns null if invalid. */
-function parseMessages(body: unknown): ChatMessage[] | null {
-  if (typeof body !== "object" || body === null) return null;
+/** Rebuilds the messages from an untrusted body, or returns why it can't. */
+function parseMessages(body: unknown): ChatMessage[] | ChatError["error"] {
+  if (typeof body !== "object" || body === null) return "invalid_request";
 
   const { messages } = body as { messages?: unknown };
-  if (!Array.isArray(messages) || messages.length === 0) return null;
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return "invalid_request";
+  }
+  if (messages.length > MAX_MESSAGES) return "conversation_too_long";
 
   const parsed: ChatMessage[] = [];
   for (const message of messages) {
-    if (typeof message !== "object" || message === null) return null;
+    if (typeof message !== "object" || message === null) {
+      return "invalid_request";
+    }
 
     const { role, content } = message as { role?: unknown; content?: unknown };
-    if (role !== "user" && role !== "assistant") return null;
-    if (typeof content !== "string" || content.trim() === "") return null;
+    if (role !== "user" && role !== "assistant") return "invalid_request";
+    if (typeof content !== "string" || content.trim() === "") {
+      return "invalid_request";
+    }
+    if (role === "user" && content.length > MAX_USER_CHARS) {
+      return "input_too_long";
+    }
 
-    parsed.push({ role, content });
+    // Past answers have no fixed length, so rejecting one could end an honest
+    // conversation.
+    parsed.push({ role, content: content.slice(0, MAX_ASSISTANT_CHARS) });
   }
 
-  return parsed[parsed.length - 1].role === "user" ? parsed : null;
+  return parsed[parsed.length - 1].role === "user"
+    ? parsed
+    : "invalid_request";
 }
 
 function recentMessages(messages: ChatMessage[]) {
@@ -162,12 +190,19 @@ async function startAnswer(
 export async function POST(request: Request) {
   const body: unknown = await request.json().catch(() => null);
   const messages = parseMessages(body);
-  if (!messages) return errorResponse(400, "invalid_request");
+  if (typeof messages === "string") return errorResponse(400, messages);
 
   const providers = PROVIDERS.filter(
     ({ keyVariable }) => process.env[keyVariable],
   );
   if (providers.length === 0) return errorResponse(503, "not_configured");
+
+  const rateLimit = await checkRateLimit(request.headers);
+  if (!rateLimit.allowed) {
+    return errorResponse(429, "rate_limited", {
+      "Retry-After": String(rateLimit.retryAfterSeconds),
+    });
+  }
 
   const answer = await startAnswer(
     providers,
