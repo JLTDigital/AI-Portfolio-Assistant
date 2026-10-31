@@ -74,9 +74,11 @@ and the `@/*` import alias maps to the root.
 
 ## Data and Validation
 
-> TODO: no database, auth, or validation library is installed yet. Record the
-> data access, API boundary, and validation conventions when the project chooses
-> them.
+> TODO: no database or auth is installed yet. Record the data access convention
+> when the project chooses one.
+
+- API boundaries use hand-written validation in the route, with no validation
+  library
 
 - Validate untrusted input at the server boundary
 - Scope user-owned data by the authenticated user on the server; never trust a
