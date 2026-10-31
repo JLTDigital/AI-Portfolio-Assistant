@@ -63,10 +63,10 @@
 **Suggested fix:** After Turndown, strip empty links and then lines holding only a heading or bullet marker, for example `.replace(/\[\]\([^)]*\)/g, "").replace(/^[ \t]*(#{1,6}|-)[ \t]*$/gm, "")`.
 **Resolution:** Repaired 2026-10-31 on fix/a-dropped-image-leaves-empty-markdown-behind: `stripImageRemnants` removes empty links, marker-only lines (including ordered markers) and the extra blank lines. With a throwaway `.docx`, images in a link, heading, bullet and numbered item left no remnant, normal text, links and nested lists were unchanged, and an images-only file still failed with `no text found`. List numbers are not renumbered, and an inline empty link leaves a double space. Real CV files not exercised.
 
-### F-12 [P3] open - A relative path resolves from the project root, not the current folder
+### F-12 [P3] fixed - A relative path resolves from the project root, not the current folder
 
 **File:** scripts/import-cv.mjs:103
 **Found:** 2026-10-31 by /audit independent (scope: current; lens: quality)
 **Why it matters:** The contract says the path resolves from the current working directory, but `npm run` changes the working directory to the project root before Node starts. From `content/`, `npm run import:cv -- sub-only-here.pdf` failed with `file not found` for a path at the project root, although the file was in the current folder. It fails safely and prints the full path, and absolute paths and runs from the root work. A same-named file at the root would be imported in its place, though the draft is still reviewed.
 **Suggested fix:** Use `resolve(process.env.INIT_CWD ?? process.cwd(), args[0])`, which npm sets to the folder the command was run from.
-**Resolution:**
+**Resolution:** Repaired 2026-10-31 on fix/a-relative-path-resolves-from-the-project-root: `resolveInput` now resolves from `INIT_CWD`, falling back to `process.cwd()`. With throwaway `.docx` files, a run from a subfolder imported the subfolder's file even with a same-named file at the root, runs from the root and absolute paths worked as before, a direct `node` run resolved from the current folder, and missing or unsupported files failed with the existing errors. Real CV files not exercised.

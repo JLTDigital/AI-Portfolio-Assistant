@@ -86,7 +86,8 @@ function resolveInput(args) {
   if (args.length !== 1) {
     throw new Error("usage: npm run import:cv -- path/to/cv.docx (or .pdf)");
   }
-  const path = resolve(args[0]);
+  // npm runs scripts from the project root, so cwd is not the folder the user is in.
+  const path = resolve(process.env.INIT_CWD ?? process.cwd(), args[0]);
   const extension = extname(path).toLowerCase();
   const format = FORMATS[extension];
   if (!format) {
