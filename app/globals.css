@@ -49,6 +49,14 @@
   );
 }
 
+@utility signal-static {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgb(201 52 63 / 0.1) 0 1px,
+    transparent 1px 4px
+  );
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

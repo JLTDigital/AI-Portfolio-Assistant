@@ -5,31 +5,40 @@ import type { FormEvent, KeyboardEvent } from "react";
 
 import { MAX_USER_CHARS } from "@/lib/chat/limits";
 
+import { SignalPanel } from "./SignalPanel";
 import { useChat } from "./use-chat";
+import { useTypedAnswer } from "./use-typed-answer";
 
 export function Chat() {
-  const { messages, status, send } = useChat();
+  const { messages, status, signalLost, callEnded, send, retry } = useChat();
   const [input, setInput] = useState("");
   const transcript = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
+  const wasLocked = useRef(false);
 
-  const answering = status === "thinking" || status === "streaming";
+  const { shownLength, typing } = useTypedAnswer(messages);
+  const answering = status === "thinking" || status === "streaming" || typing;
+  const ended = callEnded && !typing;
+  const locked = signalLost || ended;
 
+  // The panel takes height from the transcript, so its arrival also scrolls.
   useEffect(() => {
     const element = transcript.current;
     if (element) element.scrollTop = element.scrollHeight;
-  }, [messages, status]);
+  }, [messages, status, locked, shownLength]);
 
-  async function submit() {
+  useEffect(() => {
+    if (wasLocked.current && !locked) field.current?.focus();
+    wasLocked.current = locked;
+  }, [locked]);
+
+  function submit() {
     const question = input.trim();
-    if (!question || answering) return;
+    if (!question || answering || locked) return;
 
     setInput("");
     field.current?.focus();
-
-    // Anything typed while waiting is newer, so it isn't overwritten.
-    const answered = await send(question);
-    if (!answered) setInput((draft) => (draft.trim() ? draft : question));
+    send(question);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -94,7 +103,9 @@ export function Chat() {
                 <div key={index} className="max-w-[85%]">
                   <p className="text-sm font-semibold text-muted">AGENT</p>
                   <p className="wrap-anywhere whitespace-pre-wrap [text-shadow:0_0_12px_var(--glow)] motion-reduce:[text-shadow:none]">
-                    {message.content}
+                    {index === messages.length - 1
+                      ? message.content.slice(0, shownLength)
+                      : message.content}
                   </p>
                 </div>
               ),
@@ -107,10 +118,13 @@ export function Chat() {
             )}
           </div>
 
-          {status === "failed" && (
-            <p role="alert" className="text-base text-alert">
-              Transmission failed. Try again.
-            </p>
+          {locked && (
+            <SignalPanel
+              key={ended ? "ended" : "lost"}
+              ended={ended}
+              retrying={answering}
+              onRetry={retry}
+            />
           )}
 
           <form onSubmit={handleSubmit} className="flex items-stretch gap-2">
@@ -123,14 +137,15 @@ export function Chat() {
               rows={2}
               value={input}
               maxLength={MAX_USER_CHARS}
+              disabled={locked}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Message Agent"
-              className="min-w-0 flex-1 resize-none border border-line bg-background/60 p-2 placeholder:text-muted focus-visible:outline-2 focus-visible:outline-accent"
+              className="min-w-0 flex-1 resize-none border border-line bg-background/60 p-2 placeholder:text-muted focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:border-frame/60"
             />
             <button
               type="submit"
-              disabled={answering || !input.trim()}
+              disabled={answering || locked || !input.trim()}
               className="border border-amber px-4 text-base font-semibold text-amber hover:bg-amber hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:border-line disabled:text-muted disabled:hover:bg-transparent disabled:hover:text-muted"
             >
               SEND
@@ -140,7 +155,7 @@ export function Chat() {
       </div>
 
       <p aria-hidden="true" className="ml-5 text-xs text-alert sm:ml-6">
-        [ LINK: STABLE ]
+        [ LINK: {ended ? "CLOSED" : signalLost ? "LOST" : "STABLE"} ]
       </p>
     </main>
   );

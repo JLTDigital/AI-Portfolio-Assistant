@@ -9,7 +9,7 @@ High-level features in rough build order. Run `/feature` to spec the next unchec
 - [x] 3. **Chat API route** - A server-side `/api/chat` endpoint that streams answers from Gemini using the combined context and recent conversation turns.
 - [x] 4. **Provider fallback chain** - Retry on Groq, then OpenRouter, when the primary provider rate-limits, errors or times out.
 - [x] 5. **Abuse protection** - Per-IP rate limiting plus limits on input length and conversation length.
-- [ ] 6. **Signal-lost fallback** - A pre-written, in-call "signal lost" message linking to the portfolio and LinkedIn, shown when allowances run out or every provider fails.
+- [x] 6. **Signal-lost fallback** - A pre-written, in-call "signal lost" message linking to the portfolio and LinkedIn, shown when allowances run out or every provider fails.
 - [x] 7. **Chat interface** - A message transcript, an input box and streamed "holo transmission" text, responsive from mobile to desktop.
 - [ ] 8. **Suggested questions** - Clickable starter chips that send common recruiter questions.
 - [ ] 9. **Scene backdrop** - A near-black CSS backdrop with a faint grid, scanlines and vignette, plus a readability gradient behind the chat.

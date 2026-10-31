@@ -2,32 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { MAX_MESSAGES } from "@/lib/chat/limits";
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
 
-export type ChatStatus = "idle" | "thinking" | "streaming" | "failed";
+export type ChatStatus = "idle" | "thinking" | "streaming";
 
 /** Holds the conversation and streams each answer from /api/chat. */
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [status, setStatus] = useState<ChatStatus>("idle");
+  const [signalLost, setSignalLost] = useState(false);
   const request = useRef<AbortController | null>(null);
 
   useEffect(() => () => request.current?.abort(), []);
 
-  /** Resolves false if the question was not answered and should be kept. */
-  async function send(question: string) {
-    if (request.current) return false;
+  async function requestAnswer(sent: ChatMessage[]) {
+    if (request.current) return;
 
     const controller = new AbortController();
     request.current = controller;
 
-    const sent: ChatMessage[] = [
-      ...messages,
-      { role: "user", content: question },
-    ];
     setMessages(sent);
     setStatus("thinking");
 
@@ -56,21 +54,32 @@ export function useChat() {
       }
 
       if (!answer.trim()) throw new Error("Answer empty");
+      setSignalLost(false);
       setStatus("idle");
-      return true;
     } catch {
       // The visitor has left, so there's nobody to tell.
-      if (controller.signal.aborted) return false;
+      if (controller.signal.aborted) return;
 
       // A partial answer can't stay: it would look complete and go back to the
-      // model in the next request.
-      setMessages(messages);
-      setStatus("failed");
-      return false;
+      // model in the next request. The question stays so Retry can resend it.
+      setMessages(sent);
+      setSignalLost(true);
+      setStatus("idle");
     } finally {
       request.current = null;
     }
   }
 
-  return { messages, status, send };
+  function send(question: string) {
+    return requestAnswer([...messages, { role: "user", content: question }]);
+  }
+
+  function retry() {
+    return requestAnswer(messages);
+  }
+
+  const callEnded =
+    status === "idle" && !signalLost && messages.length >= MAX_MESSAGES;
+
+  return { messages, status, signalLost, callEnded, send, retry };
 }
