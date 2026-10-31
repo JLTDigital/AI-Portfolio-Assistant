@@ -23,6 +23,7 @@ Jonathan is based in **Darlington, North East England**. He is **open to remote 
 - Front-end Developer
 - Full Stack Developer
 - Shopify Developer
+- Backend Developer
 
 ## Right to work
 
