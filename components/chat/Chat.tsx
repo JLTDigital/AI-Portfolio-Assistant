@@ -6,6 +6,7 @@ import type { FormEvent, KeyboardEvent } from "react";
 import { MAX_USER_CHARS } from "@/lib/chat/limits";
 
 import { SignalPanel } from "./SignalPanel";
+import { SuggestedQuestions } from "./SuggestedQuestions";
 import { useChat } from "./use-chat";
 import { useTypedAnswer } from "./use-typed-answer";
 
@@ -38,6 +39,13 @@ export function Chat() {
 
     setInput("");
     field.current?.focus();
+    send(question);
+  }
+
+  // The chip is about to unmount, which would drop focus to the body. The
+  // transcript takes it because focusing the input opens the mobile keyboard.
+  function askSuggested(question: string) {
+    transcript.current?.focus();
     send(question);
   }
 
@@ -125,6 +133,10 @@ export function Chat() {
               retrying={answering}
               onRetry={retry}
             />
+          )}
+
+          {messages.length === 0 && (
+            <SuggestedQuestions onSelect={askSuggested} />
           )}
 
           <form onSubmit={handleSubmit} className="flex items-stretch gap-2">
