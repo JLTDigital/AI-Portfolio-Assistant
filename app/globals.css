@@ -33,6 +33,13 @@
   --animate-avatar-ring: avatar-pulse 1.6s ease-in-out infinite;
   --animate-avatar-speak: avatar-pulse 0.8s ease-in-out infinite;
   --animate-avatar-dim: avatar-dim 1.4s ease-out 0.6s forwards;
+  --animate-avatar-materialise: avatar-materialise 0.9s ease-out backwards;
+  --animate-point-of-light: point-of-light 0.5s ease-out both;
+  --animate-card-in: card-in 0.3s ease-out;
+  --animate-call-ring: call-ring 1.6s ease-out infinite;
+  --animate-connect-static: connect-static 0.4s steps(4) infinite;
+  --animate-rgb-split: rgb-split 0.6s steps(1) infinite;
+  --animate-chat-in: chat-in 0.4s ease-out 0.5s backwards;
 
   @keyframes avatar-pulse {
     50% {
@@ -43,6 +50,81 @@
   @keyframes avatar-dim {
     to {
       opacity: 0.45;
+    }
+  }
+
+  /* Clips rather than scales: the blob's canvas measures itself through
+     transforms and would stay at its mount size. */
+  @keyframes avatar-materialise {
+    from {
+      clip-path: circle(0);
+      opacity: 0;
+    }
+    60% {
+      clip-path: circle(75%);
+      opacity: 1;
+    }
+    72% {
+      opacity: 0.4;
+    }
+    84%,
+    to {
+      clip-path: circle(75%);
+      opacity: 1;
+    }
+  }
+
+  @keyframes point-of-light {
+    from {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(3);
+    }
+  }
+
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+  }
+
+  @keyframes call-ring {
+    to {
+      opacity: 0;
+      transform: scale(1.35);
+    }
+  }
+
+  @keyframes connect-static {
+    to {
+      background-position: 0 4px;
+    }
+  }
+
+  @keyframes rgb-split {
+    0% {
+      text-shadow:
+        -2px 0 var(--alert),
+        2px 0 var(--line);
+    }
+    50% {
+      text-shadow:
+        2px 0 var(--alert),
+        -2px 0 var(--line);
+    }
+  }
+
+  @keyframes chat-in {
+    from {
+      opacity: 0;
     }
   }
 }

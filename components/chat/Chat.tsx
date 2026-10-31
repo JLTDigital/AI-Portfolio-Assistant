@@ -12,7 +12,7 @@ import { SuggestedQuestions } from "./SuggestedQuestions";
 import { useChat } from "./use-chat";
 import { useTypedAnswer } from "./use-typed-answer";
 
-export function Chat() {
+export function Chat({ connected }: { connected: boolean }) {
   const { messages, status, signalLost, callEnded, send, retry } = useChat();
   const [input, setInput] = useState("");
   const transcript = useRef<HTMLDivElement>(null);
@@ -29,6 +29,11 @@ export function Chat() {
   if (status === "thinking") agentState = "thinking";
   else if (status === "streaming" || typing) agentState = "speaking";
   else if (locked) agentState = "signal-lost";
+
+  // The intro screen that held focus has just unmounted.
+  useEffect(() => {
+    if (connected) transcript.current?.focus();
+  }, [connected]);
 
   // The panel takes height from the transcript, so its arrival also scrolls.
   useEffect(() => {
@@ -71,7 +76,9 @@ export function Chat() {
   }
 
   return (
-    <main className="mx-auto flex h-dvh w-full max-w-4xl flex-col p-4 text-lg font-medium sm:p-6">
+    <main
+      className={`mx-auto flex h-dvh w-full max-w-4xl flex-col p-4 text-lg font-medium sm:p-6 ${connected ? "motion-safe:[&>:not([data-agent-avatar])]:animate-chat-in" : "invisible"}`}
+    >
       <p aria-hidden="true" className="text-xs text-alert">
         CHANNEL_HOLO_CALL
       </p>
@@ -81,7 +88,7 @@ export function Chat() {
         </h1>
       </div>
 
-      <AgentAvatar state={agentState} />
+      <AgentAvatar state={agentState} materialise={connected} />
 
       <p aria-hidden="true" className="mt-2 ml-5 text-xs text-alert sm:ml-6">
         SECURE_LINK( AgentTransmission )

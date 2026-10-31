@@ -1,11 +1,11 @@
-import { Chat } from "@/components/chat/Chat";
+import { CallSequence } from "@/components/call/CallSequence";
 import { SceneBackdrop } from "@/components/scene/SceneBackdrop";
 
 export default function Home() {
   return (
     <>
       <SceneBackdrop />
-      <Chat />
+      <CallSequence />
     </>
   );
 }
