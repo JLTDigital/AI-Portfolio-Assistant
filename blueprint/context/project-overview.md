@@ -1,6 +1,6 @@
 # Holo Call - Project Overview
 
-<!-- blueprint:source-hash 25e3f975b95200b364c25167c39b7b4e40ba53751fa5daccd641adcecc2beb9e -->
+<!-- blueprint:source-hash b4563a428e70b3561dd3b93a9809121309e6c53ee9d76e91c6894ff224482f56 -->
 
 > A cyberpunk "holo call" web app where visitors accept a call routed from the city of Velin and ask "Agent", Jonathan's AI agent, about his skills and experience. A free-tier LLM answers only from his CV, LinkedIn and portfolio content.
 
@@ -63,7 +63,7 @@ In build-plan order. The headline experience is the grounded chat (1-8) inside t
 11. **Incoming call intro** - caller card reading "Agent", Accept, connecting glitch, blob materialising, hand-off to chat.
 12. **Intro controls** - a reduced-motion version of the intro. Every visit starts at the call screen with Accept.
 13. **End call** - collapse the call, reset the conversation, show contact links.
-14. **Contact links bar** - persistent links to download the CV, LinkedIn, portfolio and email.
+14. **Contact links bar** - persistent links to the portfolio and LinkedIn.
 15. **Call sounds** - optional ring and connect tones, muted by default, with a toggle.
 16. **Accessibility & mobile pass** - keyboard use, screen-reader-friendly transcript, contrast checks, no harsh flashing.
 17. **Privacy note & share metadata** - one-line AI privacy note, page metadata, Open Graph image of the holo-call card.
@@ -112,7 +112,7 @@ The conversation lives in the browser and is never persisted server-side. `/api/
 
 ### Static assets
 
-CV PDF and optional sound files. Agent renders live in WebGL and the backdrop is CSS, so no images are needed.
+Optional sound files. Agent renders live in WebGL and the backdrop is CSS, so no images are needed.
 
 ### Updating the knowledge base (required)
 
@@ -215,6 +215,5 @@ Shown when every provider's allowance is used up, the visitor hits their rate li
 - **Non-tech roles:** §2 and a suggested chip say Jonathan is open to non-tech roles; the agreed target roles list only three developer roles.
 - **Desktop layout:** §7's flow docks chat beside Agent; §7's avatar section places Agent centred above the chat.
 - **Ringing state:** feature 10 and §7 give the blob a ringing state, but the flow only materialises it after Connecting.
-- **Content authoring:** feature 1 reads `content/`, which doesn't exist yet, and no feature writes the knowledge base, `persona.md` or the CV PDF.
-- **Contact details:** no env var or location is defined for the email address or CV PDF used by feature 14.
+- **Content authoring:** feature 1 reads `content/`, which doesn't exist yet, and no feature writes the knowledge base or `persona.md`.
 - **Health check scope:** the plan makes provider reachability optional; feature 18 makes it required, and probing may spend free quota.

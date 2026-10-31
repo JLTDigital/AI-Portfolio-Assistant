@@ -68,7 +68,7 @@ Assume users are **not** cyberpunk fans: the theme must be a hook, never a barri
 
 **Supporting**
 
-- Persistent links: Download CV, LinkedIn, portfolio, email/contact.
+- Persistent links: portfolio, LinkedIn.
 - Optional sound (ring, connect tone) — **muted by default** with a toggle.
 - Fully responsive, mobile first.
 - Accessible: keyboard operable, readable contrast for chat text, screen-reader-friendly transcript.
@@ -108,7 +108,7 @@ Assume users are **not** cyberpunk fans: the theme must be a hook, never a barri
     - **Right to work:** not included. If asked, Agent says to contact Jonathan directly.
     - **Anything else not covered:** Agent says it doesn't have that detail and points to contact details.
   - `content/persona.md` — the AI's identity and rules: "Agent", Jonathan's AI agent operating out of Velin, which handles his calls, speaks about him in the third person, answers only from the knowledge base, and never invents facts.
-- **Static assets:** CV PDF, optional sound files. Agent's avatar is rendered live in WebGL, and the backdrop is CSS, so no images are needed.
+- **Static assets:** optional sound files. Agent's avatar is rendered live in WebGL, and the backdrop is CSS, so no images are needed.
 - **Session state:** conversation held in the browser only; nothing persisted server-side.
 - **Rate-limit counters:** short-lived per-IP counters in a free hosted key-value store (see §5).
 

@@ -7,6 +7,7 @@ import { useChat } from "@/components/chat/use-chat";
 
 import { CallEnded } from "./CallEnded";
 import { Connecting } from "./Connecting";
+import { ContactLinks } from "./ContactLinks";
 import { IncomingCall } from "./IncomingCall";
 
 type Stage = "ringing" | "connecting" | "connected" | "ending" | "ended";
@@ -48,7 +49,7 @@ export function CallSequence() {
   // Chat stays mounted but invisible from the start: WebGL startup blocks the
   // main thread, so it has to happen before anything needs to animate.
   return (
-    <>
+    <div className="flex h-dvh flex-col">
       {stage === "ringing" && <IncomingCall onAccept={accept} />}
       {stage === "connecting" && <Connecting />}
       {stage === "ended" && <CallEnded onCallAgain={accept} />}
@@ -58,6 +59,12 @@ export function CallSequence() {
         closing={stage === "ending"}
         onEnd={endCall}
       />
-    </>
+      <nav
+        aria-label="Contact"
+        className="flex flex-wrap justify-center gap-2 px-4 pb-2"
+      >
+        <ContactLinks />
+      </nav>
+    </div>
   );
 }

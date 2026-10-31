@@ -90,7 +90,7 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
   return (
     <main
       inert={closing}
-      className={`mx-auto flex h-dvh w-full max-w-4xl flex-col p-4 text-lg font-medium sm:p-6 ${connected ? "motion-safe:[&>:not([data-agent-avatar])]:animate-chat-in" : "invisible"} ${closing ? "animate-call-collapse" : ""}`}
+      className={`mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col p-4 text-lg font-medium sm:p-6 ${connected ? "motion-safe:[&>:not([data-agent-avatar])]:animate-chat-in" : "invisible"} ${closing ? "animate-call-collapse" : ""}`}
     >
       <p aria-hidden="true" className="text-xs text-alert">
         CHANNEL_HOLO_CALL

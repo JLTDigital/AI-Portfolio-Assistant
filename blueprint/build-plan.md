@@ -17,7 +17,7 @@ High-level features in rough build order. Run `/feature` to spec the next unchec
 - [x] 11. **Incoming call intro** - Caller card reading "Agent", Accept button, connecting glitch and the Agent blob materialising, before handing off to the chat.
 - [x] 12. **Intro controls** - A reduced-motion version of the intro. Every visit starts at the call screen with Accept.
 - [x] 13. **End call** - Collapse the call and reset the conversation, then show contact links.
-- [ ] 14. **Contact links bar** - Persistent links to download the CV, LinkedIn, the portfolio and email.
+- [x] 14. **Contact links bar** - Persistent links to the portfolio and LinkedIn.
 - [ ] 15. **Call sounds** - Optional ring and connect tones, muted by default, with a toggle.
 - [ ] 16. **Accessibility & mobile pass** - Keyboard use, screen-reader-friendly transcript, contrast checks and no harsh flashing.
 - [ ] 17. **Privacy note & share metadata** - A one-line AI privacy note, page metadata, and an Open Graph image of the holo-call card for LinkedIn previews.
