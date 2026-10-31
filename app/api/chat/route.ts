@@ -1,11 +1,34 @@
 import { google } from "@ai-sdk/google";
+import { groq } from "@ai-sdk/groq";
+import { openrouter } from "@openrouter/ai-sdk-provider";
 import { APICallError, RetryError, streamText } from "ai";
 
 import { getKnowledgeContext } from "@/lib/knowledge";
 
-const MODEL = "gemini-3.5-flash-lite";
+const GOOGLE_MODEL = "gemini-3.5-flash-lite";
+const GROQ_MODEL = "openai/gpt-oss-120b";
+const OPENROUTER_MODEL = "nvidia/nemotron-3.5-super-vl:free";
 const RECENT_MESSAGES = 10;
 const CHAT_TIMEOUT_MS = 30_000;
+const FIRST_TEXT_TIMEOUT_MS = 10_000;
+
+const PROVIDERS = [
+  {
+    name: "google",
+    keyVariable: "GOOGLE_GENERATIVE_AI_API_KEY",
+    model: () => google(GOOGLE_MODEL),
+  },
+  {
+    name: "groq",
+    keyVariable: "GROQ_API_KEY",
+    model: () => groq(GROQ_MODEL),
+  },
+  {
+    name: "openrouter",
+    keyVariable: "OPENROUTER_API_KEY",
+    model: () => openrouter(OPENROUTER_MODEL),
+  },
+];
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -71,13 +94,69 @@ async function nextText(parts: StreamParts): Promise<string | null> {
 }
 
 // SDK errors can hold the full request, including visitor text and the system
-// prompt, so only these two fields are ever logged.
-function logFailure(error: unknown) {
+// prompt, so only these fields are ever logged.
+function logFailure(provider: string, error: unknown) {
   const cause = RetryError.isInstance(error) ? error.lastError : error;
   console.error("Chat stream failed", {
+    provider,
     name: error instanceof Error ? error.name : "UnknownError",
     statusCode: APICallError.isInstance(cause) ? cause.statusCode : undefined,
   });
+}
+
+/**
+ * Tries each provider in order until one sends text. Nothing has reached the
+ * visitor until then, so a failure can still move on without them seeing it.
+ */
+async function startAnswer(
+  providers: typeof PROVIDERS,
+  messages: ChatMessage[],
+  signal: AbortSignal,
+) {
+  for (const provider of providers) {
+    // The SDK's firstChunkMs only starts once the response opens, so it can't
+    // catch a provider that never answers.
+    const firstTextLimit = new AbortController();
+    const firstTextTimer = setTimeout(
+      () => firstTextLimit.abort(),
+      FIRST_TEXT_TIMEOUT_MS,
+    );
+
+    const result = streamText({
+      model: provider.model(),
+      instructions: getKnowledgeContext().systemPrompt,
+      messages,
+      abortSignal: AbortSignal.any([
+        signal,
+        firstTextLimit.signal,
+        AbortSignal.timeout(CHAT_TIMEOUT_MS),
+      ]),
+      // The next provider is the retry. Backing off would only spend the
+      // visitor's time and more quota.
+      maxRetries: 0,
+      // Replaces the SDK default, which logs the whole error. Failures are
+      // logged once, where the stream is read.
+      onError: () => {},
+    });
+    const parts: StreamParts = result.stream[Symbol.asyncIterator]();
+
+    try {
+      const firstText = await nextText(parts);
+      if (firstText === null) {
+        throw new DOMException("Answer empty", "EmptyAnswer");
+      }
+      return { provider: provider.name, parts, firstText };
+    } catch (error) {
+      await parts.return?.();
+      // The visitor has gone, so another provider would only spend quota.
+      if (signal.aborted) return null;
+      logFailure(provider.name, error);
+    } finally {
+      clearTimeout(firstTextTimer);
+    }
+  }
+
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -85,37 +164,18 @@ export async function POST(request: Request) {
   const messages = parseMessages(body);
   if (!messages) return errorResponse(400, "invalid_request");
 
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-    return errorResponse(503, "not_configured");
-  }
+  const providers = PROVIDERS.filter(
+    ({ keyVariable }) => process.env[keyVariable],
+  );
+  if (providers.length === 0) return errorResponse(503, "not_configured");
 
-  const result = streamText({
-    model: google(MODEL),
-    instructions: getKnowledgeContext().systemPrompt,
-    messages: recentMessages(messages),
-    abortSignal: AbortSignal.any([
-      request.signal,
-      AbortSignal.timeout(CHAT_TIMEOUT_MS),
-    ]),
-    // Replaces the SDK default, which logs the whole error. Failures are
-    // logged once, where the stream is read.
-    onError: () => {},
-  });
-  const parts: StreamParts = result.stream[Symbol.asyncIterator]();
-
-  // Nothing has reached the visitor until the first text arrives, so failures
-  // up to this point can still return a JSON error.
-  let firstText: string | null;
-  try {
-    firstText = await nextText(parts);
-  } catch (error) {
-    if (!request.signal.aborted) logFailure(error);
-    return errorResponse(502, "provider_error");
-  }
-  if (firstText === null) {
-    logFailure(new DOMException("Answer empty", "EmptyAnswer"));
-    return errorResponse(502, "provider_error");
-  }
+  const answer = await startAnswer(
+    providers,
+    recentMessages(messages),
+    request.signal,
+  );
+  if (!answer) return errorResponse(502, "provider_error");
+  const { provider, parts, firstText } = answer;
 
   const encoder = new TextEncoder();
   let cancelled = false;
@@ -131,7 +191,7 @@ export async function POST(request: Request) {
       } catch (error) {
         // A chunk can still arrive after the visitor disconnects.
         if (cancelled || request.signal.aborted) return;
-        logFailure(error);
+        logFailure(provider, error);
         // Rejects the client's read, so a cut-off answer can't look complete.
         // A new error keeps the SDK object out of Next's own failure log.
         controller.error(new DOMException("Chat stream failed", "AbortError"));
