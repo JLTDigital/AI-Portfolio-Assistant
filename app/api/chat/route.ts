@@ -1,4 +1,4 @@
-import { APICallError, RetryError, streamText } from "ai";
+import { APICallError, StreamProviderError, streamText } from "ai";
 
 import { MAX_MESSAGES, MAX_USER_CHARS } from "@/lib/chat/limits";
 import { PROVIDERS } from "@/lib/chat/providers";
@@ -115,11 +115,13 @@ async function firstVisibleText(parts: StreamParts): Promise<string | null> {
 // SDK errors can hold the full request, including visitor text and the system
 // prompt, so only these fields are ever logged.
 function logFailure(provider: string, error: unknown) {
-  const cause = RetryError.isInstance(error) ? error.lastError : error;
   console.error("Chat stream failed", {
     provider,
     name: error instanceof Error ? error.name : "UnknownError",
-    statusCode: APICallError.isInstance(cause) ? cause.statusCode : undefined,
+    statusCode:
+      APICallError.isInstance(error) || StreamProviderError.isInstance(error)
+        ? error.statusCode
+        : undefined,
   });
 }
 
