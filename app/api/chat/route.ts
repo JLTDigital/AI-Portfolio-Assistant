@@ -97,6 +97,21 @@ async function nextText(parts: StreamParts): Promise<string | null> {
   }
 }
 
+/**
+ * Returns the text so far once it has visible content, or null if the stream
+ * ends first. A whitespace chunk alone must not commit to a provider.
+ */
+async function firstVisibleText(parts: StreamParts): Promise<string | null> {
+  let text = "";
+  while (true) {
+    const chunk = await nextText(parts);
+    if (chunk === null) return null;
+
+    text += chunk;
+    if (text.trim()) return text;
+  }
+}
+
 // SDK errors can hold the full request, including visitor text and the system
 // prompt, so only these fields are ever logged.
 function logFailure(provider: string, error: unknown) {
@@ -145,7 +160,7 @@ async function startAnswer(
     const parts: StreamParts = result.stream[Symbol.asyncIterator]();
 
     try {
-      const firstText = await nextText(parts);
+      const firstText = await firstVisibleText(parts);
       if (firstText === null) {
         throw new DOMException("Answer empty", "EmptyAnswer");
       }

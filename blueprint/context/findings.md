@@ -31,13 +31,13 @@
 **Suggested fix:** Slice from the first `user` message in the window, for example `recent.slice(recent.findIndex((m) => m.role === "user"))`. The last message is always `user`, so the index always exists.
 **Resolution:** Re-review 2026-10-31 (independent, target ff7a9ca): still open at line 75. With a fake fetch, `[assistant, assistant, user]` reached Gemini as `["model", "user"]` and Groq as `["system", "assistant", "user"]`. With the chain, a provider that rejects this shape now costs one failed attempt and falls through instead of returning `502`. Real provider behaviour remains untested. Re-review 2026-10-31 (independent, target 35b1daa): still open, code unchanged by this delta, now at line 103. Re-review 2026-10-31 (independent, target d952d8b): still open, logic unchanged, now at line 79.
 
-### F-07 [P2] open - A whitespace-only answer skips the fallback
+### F-07 [P2] fixed - A whitespace-only answer skips the fallback
 
 **File:** app/api/chat/route.ts:88
 **Found:** 2026-10-31 by /audit independent (scope: current; lens: quality)
 **Why it matters:** The spec says an empty answer falls through, but `nextText` treats any non-empty delta as the first text. Under `next start` with a fake fetch, a Gemini answer of `\n\n` that finished with `stop` returned `200` with a blank body, called only Gemini and logged nothing, with healthy fallbacks available. A single space followed by a stream error ended the client read with curl exit 18 and also tried no other provider. No real provider has been seen doing this, so reachability is unconfirmed.
 **Suggested fix:** In `startAnswer`, keep reading until the first text has non-whitespace content, then send the text read so far as `firstText`. Stream all later chunks unchanged, and treat an all-whitespace answer as `EmptyAnswer`.
-**Resolution:** Re-review 2026-10-31 (independent, target 35b1daa): still open, code unchanged by this delta, now at line 112. Re-review 2026-10-31 (independent, target d952d8b): still open, logic unchanged, now at line 88.
+**Resolution:** Re-review 2026-10-31 (independent, target 35b1daa): still open, code unchanged by this delta, now at line 112. Re-review 2026-10-31 (independent, target d952d8b): still open, logic unchanged, now at line 88. Repaired 2026-10-31 on fix/whitespace-only-answers-skip-the-fallback: `startAnswer` now waits for visible text through `firstVisibleText`. Under `next start` with a fake fetch, whitespace then `stop`, a stream error or a stall each fell through to Groq, all-whitespace answers returned `502`, and spacing in a normal answer was unchanged. Real providers not exercised.
 
 ### F-08 [P3] open - The `RetryError` branch in `logFailure` can no longer run
 
