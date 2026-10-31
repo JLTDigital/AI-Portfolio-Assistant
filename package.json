@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "import:cv": "node scripts/import-cv.mjs"
+    "import:cv": "node scripts/import-cv.mjs",
+    "import:portfolio": "node scripts/import-portfolio.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.109",

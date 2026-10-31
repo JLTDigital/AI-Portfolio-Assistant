@@ -1,14 +1,17 @@
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, dirname, extname, join, relative, resolve } from "node:path";
+import { basename, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import mammoth from "mammoth";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import TurndownService from "turndown";
-import { loadKnowledge, TOKEN_BUDGET } from "./build-knowledge.mjs";
+import {
+  assertFileIsClean,
+  CONTENT_DIR,
+  localDate,
+  reportTokens,
+  ROOT,
+} from "./import-helpers.mjs";
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const CONTENT_DIR = join(ROOT, "content");
 const OUTPUT_FILE = join(CONTENT_DIR, "cv.md");
 const OUTPUT_PATH = relative(ROOT, OUTPUT_FILE);
 
@@ -71,31 +74,6 @@ export function buildCvFile({ body, format, name, date }) {
   ].join("\n");
 }
 
-function assertCvFileIsClean() {
-  let status;
-  try {
-    status = execFileSync("git", ["status", "--porcelain", "--", OUTPUT_PATH], {
-      cwd: ROOT,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-  } catch {
-    throw new Error(`could not check ${OUTPUT_PATH} with git, so it was not overwritten`);
-  }
-  if (status.trim()) {
-    throw new Error(
-      `${OUTPUT_PATH} has uncommitted changes. Commit them, or discard them with "git restore ${OUTPUT_PATH}", then run the import again`,
-    );
-  }
-}
-
-function localDate() {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${now.getFullYear()}-${month}-${day}`;
-}
-
 function resolveInput(args) {
   if (args.length !== 1) {
     throw new Error("usage: npm run import:cv -- path/to/cv.docx (or .pdf)");
@@ -114,7 +92,7 @@ function resolveInput(args) {
 
 async function importCv(args) {
   const { path, format, name } = resolveInput(args);
-  assertCvFileIsClean();
+  assertFileIsClean(OUTPUT_PATH);
 
   let converted;
   try {
@@ -142,16 +120,6 @@ Review the draft before committing: git diff ${OUTPUT_PATH}
 - Restore any hand-written detail the import lost.
 - Discard the draft with: git restore ${OUTPUT_PATH}
 `);
-}
-
-function reportTokens() {
-  const { estimatedTokens } = loadKnowledge(CONTENT_DIR);
-  console.log(`Knowledge base: about ${estimatedTokens} tokens`);
-  if (estimatedTokens > TOKEN_BUDGET) {
-    console.warn(
-      `Knowledge base warning: about ${estimatedTokens} tokens, over the ${TOKEN_BUDGET} budget`,
-    );
-  }
 }
 
 async function main() {
