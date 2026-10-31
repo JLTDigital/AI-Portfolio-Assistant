@@ -72,6 +72,10 @@ export function CallSequence() {
         <button type="button" onClick={sounds.toggle} className={CONTROL}>
           SOUND: {sounds.enabled ? "ON" : "OFF"}
         </button>
+        <p className="w-full text-center text-sm text-muted">
+          Questions go to third-party AI providers, which may use them to
+          improve their models. This site doesn&apos;t keep them.
+        </p>
       </div>
     </div>
   );
