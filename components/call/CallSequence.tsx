@@ -7,8 +7,9 @@ import { useChat } from "@/components/chat/use-chat";
 
 import { CallEnded } from "./CallEnded";
 import { Connecting } from "./Connecting";
-import { ContactLinks } from "./ContactLinks";
+import { CONTROL, ContactLinks } from "./ContactLinks";
 import { IncomingCall } from "./IncomingCall";
+import { useCallSounds } from "./use-call-sounds";
 
 type Stage = "ringing" | "connecting" | "connected" | "ending" | "ended";
 
@@ -22,6 +23,7 @@ function prefersReducedMotion() {
 export function CallSequence() {
   const [stage, setStage] = useState<Stage>("ringing");
   const chat = useChat();
+  const sounds = useCallSounds(stage === "ringing");
 
   useEffect(() => {
     if (stage !== "connecting") return;
@@ -31,6 +33,7 @@ export function CallSequence() {
   }, [stage]);
 
   function accept() {
+    sounds.playConnect();
     setStage(prefersReducedMotion() ? "connected" : "connecting");
   }
 
@@ -59,12 +62,17 @@ export function CallSequence() {
         closing={stage === "ending"}
         onEnd={endCall}
       />
-      <nav
-        aria-label="Contact"
-        className="flex flex-wrap justify-center gap-2 px-4 pb-2"
-      >
-        <ContactLinks />
-      </nav>
+      <div className="flex flex-wrap justify-center gap-2 px-4 pb-2">
+        <nav
+          aria-label="Contact"
+          className="flex flex-wrap justify-center gap-2"
+        >
+          <ContactLinks />
+        </nav>
+        <button type="button" onClick={sounds.toggle} className={CONTROL}>
+          SOUND: {sounds.enabled ? "ON" : "OFF"}
+        </button>
+      </div>
     </div>
   );
 }
