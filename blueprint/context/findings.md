@@ -55,13 +55,13 @@
 **Suggested fix:** Add credentials and run the step 3 check, or add one line to the spec saying the 429 path was not exercised live, then confirm the limiter works in the deployed environment.
 **Resolution:** Evidence added 2026-10-31: with real Upstash credentials and stubbed providers, requests 1-20 returned 200, 21 and 22 returned 429 `rate_limited` with `Retry-After`, and a later over-long request returned 400. Provider calls: 20. Status left open for a review pass.
 
-### F-11 [P3] open - A dropped image leaves empty markdown behind
+### F-11 [P3] fixed - A dropped image leaves empty markdown behind
 
 **File:** scripts/import-cv.mjs:22
 **Found:** 2026-10-31 by /audit independent (scope: current; lens: quality)
 **Why it matters:** The spec says DOCX conversion drops images, and the `dropImages` rule removes the image but not its wrapper. A throwaway `.docx` produced `[](https://jlt.digital/)` from an image inside a link, `## ` from an image in a heading, and `-` from an image in a list item. Linked social icons are common on CVs. The URL survives, but as a link with no text, and it reaches the system prompt that way unless removed. The review reminder asks Jonathan to read the draft, so this is cleanup, not data loss. No base64 or image text survived.
 **Suggested fix:** After Turndown, strip empty links and then lines holding only a heading or bullet marker, for example `.replace(/\[\]\([^)]*\)/g, "").replace(/^[ \t]*(#{1,6}|-)[ \t]*$/gm, "")`.
-**Resolution:**
+**Resolution:** Repaired 2026-10-31 on fix/a-dropped-image-leaves-empty-markdown-behind: `stripImageRemnants` removes empty links, marker-only lines (including ordered markers) and the extra blank lines. With a throwaway `.docx`, images in a link, heading, bullet and numbered item left no remnant, normal text, links and nested lists were unchanged, and an images-only file still failed with `no text found`. List numbers are not renumbered, and an inline empty link leaves a double space. Real CV files not exercised.
 
 ### F-12 [P3] open - A relative path resolves from the project root, not the current folder
 

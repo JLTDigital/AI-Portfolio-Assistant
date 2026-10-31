@@ -17,6 +17,14 @@ const OUTPUT_PATH = relative(ROOT, OUTPUT_FILE);
 
 const ROLE = "Primary source. Canonical record of employment, skills and education.";
 
+// dropImages removes the image but not the link, heading or list item around it.
+function stripImageRemnants(markdown) {
+  return markdown
+    .replace(/\[\]\([^)]*\)/g, "")
+    .replace(/^[ \t]*(#{1,6}|-|\d+\.)[ \t]*(\n|$)/gm, "")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
 async function convertDocx(path) {
   const { value, messages } = await mammoth.convertToHtml({ path });
   const turndown = new TurndownService({ headingStyle: "atx", bulletListMarker: "-" });
@@ -25,7 +33,7 @@ async function convertDocx(path) {
   turndown.addRule("dropImages", { filter: "img", replacement: () => "" });
   // Turndown pads bullets to four columns, unlike the rest of content/.
   const body = turndown.turndown(value).replace(/^([ \t]*)-[ \t]+/gm, "$1- ");
-  return { body, notes: messages.map(({ message }) => message) };
+  return { body: stripImageRemnants(body), notes: messages.map(({ message }) => message) };
 }
 
 function pageToLines(textContent) {
