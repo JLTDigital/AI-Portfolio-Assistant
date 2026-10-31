@@ -70,7 +70,7 @@ export default function Image() {
             padding: "43px 59px 67px",
           }}
         >
-          <div style={{ fontSize: 34, color: "#ff5a5f" }}>VELIN NETWORK</div>
+          <div style={{ fontSize: 34, color: "#ff5a5f" }}>LLM NETWORK</div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 40 }}>
             <div
