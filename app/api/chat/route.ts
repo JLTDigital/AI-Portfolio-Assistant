@@ -1,37 +1,14 @@
-import { google } from "@ai-sdk/google";
-import { groq } from "@ai-sdk/groq";
-import { openrouter } from "@openrouter/ai-sdk-provider";
 import { APICallError, RetryError, streamText } from "ai";
 
 import { MAX_MESSAGES, MAX_USER_CHARS } from "@/lib/chat/limits";
+import { PROVIDERS } from "@/lib/chat/providers";
 import { getKnowledgeContext } from "@/lib/knowledge";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-const GOOGLE_MODEL = "gemini-3.5-flash-lite";
-const GROQ_MODEL = "openai/gpt-oss-120b";
-const OPENROUTER_MODEL = "nvidia/nemotron-3.5-super-vl:free";
 const RECENT_MESSAGES = 10;
 const MAX_ASSISTANT_CHARS = 4_000;
 const CHAT_TIMEOUT_MS = 30_000;
 const FIRST_TEXT_TIMEOUT_MS = 10_000;
-
-const PROVIDERS = [
-  {
-    name: "google",
-    keyVariable: "GOOGLE_GENERATIVE_AI_API_KEY",
-    model: () => google(GOOGLE_MODEL),
-  },
-  {
-    name: "groq",
-    keyVariable: "GROQ_API_KEY",
-    model: () => groq(GROQ_MODEL),
-  },
-  {
-    name: "openrouter",
-    keyVariable: "OPENROUTER_API_KEY",
-    model: () => openrouter(OPENROUTER_MODEL),
-  },
-];
 
 interface ChatMessage {
   role: "user" | "assistant";
