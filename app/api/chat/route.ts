@@ -3,6 +3,7 @@ import { groq } from "@ai-sdk/groq";
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import { APICallError, RetryError, streamText } from "ai";
 
+import { MAX_USER_CHARS } from "@/lib/chat/limits";
 import { getKnowledgeContext } from "@/lib/knowledge";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -11,7 +12,6 @@ const GROQ_MODEL = "openai/gpt-oss-120b";
 const OPENROUTER_MODEL = "nvidia/nemotron-3.5-super-vl:free";
 const RECENT_MESSAGES = 10;
 const MAX_MESSAGES = 40;
-const MAX_USER_CHARS = 500;
 const MAX_ASSISTANT_CHARS = 4_000;
 const CHAT_TIMEOUT_MS = 30_000;
 const FIRST_TEXT_TIMEOUT_MS = 10_000;

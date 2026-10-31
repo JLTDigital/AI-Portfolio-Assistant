@@ -49,8 +49,10 @@ and the `@/*` import alias maps to the root.
 - Build-time scripts: `scripts/` (plain `.mjs`, run by Node without a TypeScript step)
 - Knowledge base: `content/*.md`, generated into `lib/knowledge/knowledge.generated.json`
 
-> TODO: no components, actions, or types folders exist yet. Record where they
-> live when the first feature adds one.
+- Components and their hooks: `components/<area>/`
+
+> TODO: no actions or types folders exist yet. Record where they live when the
+> first feature adds one.
 
 ## Naming
 
@@ -67,8 +69,7 @@ and the `@/*` import alias maps to the root.
   `tailwind.config.js`. It runs through the `@tailwindcss/turbopack` loader set in
   `next.config.ts`, so there is no PostCSS config.
 - No inline styles
-- Theme colors are CSS variables in `app/globals.css`, with dark mode following
-  `prefers-color-scheme`
+- Theme colors are CSS variables in `app/globals.css`. The site is dark only.
 
 > TODO: no component library is installed. Record one here if the project adopts it.
 

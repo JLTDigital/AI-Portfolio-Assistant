@@ -187,7 +187,8 @@ Shown when every provider's allowance is used up, the visitor hits their rate li
 - Styled as part of the call (glitch or static), never a browser error or blank screen.
 - Portfolio and LinkedIn appear as clear buttons or links.
 - Example: "SIGNAL LOST — Agent's bandwidth is maxed out for now. You can find Jonathan's full details on his portfolio or LinkedIn."
-- Chat input is disabled with a short "try again later" note.
+- Chat input stays disabled, with a short "try again later" note, until a Retry button resends the last question and it succeeds.
+- At the 40-message cap, the same styling and links appear with end-of-call wording and no retry.
 
 ### Accessibility
 
@@ -214,12 +215,10 @@ Shown when every provider's allowance is used up, the visitor hits their rate li
 
 > TODOs and contradictions found between the two plans. Resolve them in the plans, then re-run /overview. Delete this section when empty.
 
-- **Signal-lost recovery:** project-plan §3 keeps the input disabled "until a new request succeeds", but a disabled input can't send a request. Needs a recovery trigger.
 - **Privacy wording:** §9 says questions are "not stored", but §5 says Google's free tier may use requests to improve its models.
 - **Non-tech roles:** §2 and a suggested chip say Jonathan is open to non-tech roles; the agreed target roles list only three developer roles.
 - **Desktop layout:** §7's flow docks chat beside Agent; §7's avatar section places Agent centred above the chat.
 - **Ringing state:** feature 10 and §7 give the blob a ringing state, but the flow only materialises it after Connecting.
-- **Build order:** feature 6 needs in-call UI and input disabling, which arrive in feature 7; its blob state arrives in feature 10.
 - **Content authoring:** feature 1 reads `content/`, which doesn't exist yet, and no feature writes the knowledge base, `persona.md` or the CV PDF.
 - **Contact details:** no env var or location is defined for the email address or CV PDF used by feature 14.
 - **Health check scope:** the plan makes provider reachability optional; feature 18 makes it required, and probing may spend free quota.

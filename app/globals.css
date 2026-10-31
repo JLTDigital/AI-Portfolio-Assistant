@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --background: #07060c;
+  --foreground: #6df5ea;
+  --accent: #6df5ea;
+  --amber: #f7c766;
+  --muted: #86aeb0;
+  --alert: #ff5a5f;
+  --frame: #c9343f;
+  --line: #2f6a70;
+  --panel-from: #150d24;
+  --panel-to: #071b24;
+  --glow: rgb(109 245 234 / 0.35);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-amber: var(--amber);
+  --color-alert: var(--alert);
+  --color-frame: var(--frame);
+  --color-line: var(--line);
+  --color-panel-from: var(--panel-from);
+  --color-panel-to: var(--panel-to);
+  --font-sans: var(--font-rajdhani);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@utility cut-sm {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    0 100%
+  );
+}
+
+@utility cut-lg {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 36px),
+    calc(100% - 36px) 100%,
+    0 100%
+  );
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
