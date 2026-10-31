@@ -56,8 +56,7 @@ Assume users are **not** cyberpunk fans: the theme must be a hook, never a barri
 
 - Incoming holo-call screen over the background scene (caller ID **"Agent"**, pulsing ring, "Accept" control).
 - Accept triggers a "connecting" glitch/static transition, then Agent (the Morphing Blob) materialises.
-- Skip-intro control, and auto-skip/simplified version when `prefers-reduced-motion` is set.
-- Remember that the visitor has seen the intro (local storage, wrapped in try/catch) so return visits go straight to the chat.
+- A simplified version of the intro when `prefers-reduced-motion` is set. Every visit starts at the call screen with Accept; there is no skip and no remembering of past visits.
 
 **Chat**
 
@@ -182,7 +181,7 @@ Possible future angle (not MVP): if it gets a good reaction, the concept could b
 **Experience flow:**
 
 1. **Scene** — near-black page with faint grid lines and scanlines. Empty and waiting.
-2. **Incoming call** — a compact call card slides in (top right on desktop, top centre on mobile): caller name, "INCOMING HOLO CALL", animated signal bars and a pulsing ring. Large "Accept" button; "Skip intro" link.
+2. **Incoming call** — a compact call card slides in (top right on desktop, top centre on mobile): caller name, "INCOMING HOLO CALL", animated signal bars and a pulsing ring. Large "Accept" button, shown on every visit.
 3. **Connecting** — brief (≤1.5s) burst of static, scanlines and RGB split, with a "CONNECTING… ENCRYPTED LINK ESTABLISHED" status line.
 4. **Agent materialises** — the Morphing Blob scales and fades in from a point of light, flickers once, then settles into a slow idle morph.
 5. **Conversation** — chat panel docked beside Agent (desktop) or below it (mobile). Suggested-question chips sit above the input. Answers type out as streamed text with a soft glow.
@@ -233,7 +232,7 @@ Possible future angle (not MVP): if it gets a good reaction, the concept could b
 - No rapid full-screen flashing (photosensitivity — keep flicker subtle and below flash thresholds).
 - Sound off by default.
 - Chat text meets WCAG AA contrast.
-- First meaningful interaction reachable within ~3 seconds, or instantly via Skip.
+- First meaningful interaction reachable within ~3 seconds.
 
 ---
 

@@ -1,6 +1,6 @@
 # Holo Call - Project Overview
 
-<!-- blueprint:source-hash afb3b735c8e8f719524341d022d7c735401c2363880ebff5d94e519c836c0e90 -->
+<!-- blueprint:source-hash 25e3f975b95200b364c25167c39b7b4e40ba53751fa5daccd641adcecc2beb9e -->
 
 > A cyberpunk "holo call" web app where visitors accept a call routed from the city of Velin and ask "Agent", Jonathan's AI agent, about his skills and experience. A free-tier LLM answers only from his CV, LinkedIn and portfolio content.
 
@@ -61,7 +61,7 @@ In build-plan order. The headline experience is the grounded chat (1-8) inside t
 9. **Scene backdrop** - near-black CSS backdrop with grid, scanlines and vignette, plus a readability gradient behind the chat.
 10. **Agent blob avatar** - Nyx UI Morphing Blob with idle, ringing, thinking, speaking and signal-lost states; browser-only, with mobile, reduced-motion and no-WebGL fallbacks.
 11. **Incoming call intro** - caller card reading "Agent", Accept, connecting glitch, blob materialising, hand-off to chat.
-12. **Intro controls** - Skip, a reduced-motion version, and remembering returning visitors so they go straight to chat.
+12. **Intro controls** - a reduced-motion version of the intro. Every visit starts at the call screen with Accept.
 13. **End call** - collapse the call, reset the conversation, show contact links.
 14. **Contact links bar** - persistent links to download the CV, LinkedIn, portfolio and email.
 15. **Call sounds** - optional ring and connect tones, muted by default, with a toggle.
@@ -110,10 +110,6 @@ The conversation lives in the browser and is never persisted server-side. `/api/
 - key (per-IP identifier)
 - count within the current window, expiring automatically
 
-### Intro-seen flag (browser local storage)
-
-- boolean flag, read and written inside try/catch
-
 ### Static assets
 
 CV PDF and optional sound files. Agent renders live in WebGL and the backdrop is CSS, so no images are needed.
@@ -155,7 +151,7 @@ A cyberpunk holo call inspired by, not copied from, the Cyberpunk 2077 UI. Dark,
 ### Flow
 
 1. **Scene** - near-black page with faint grid lines and scanlines.
-2. **Incoming call** - compact card slides in (top right on desktop, centred on the page on mobile) with caller "Agent", optional "VELIN NETWORK" label, "INCOMING HOLO CALL", signal bars, pulsing ring, large Accept, Skip intro.
+2. **Incoming call** - compact card slides in (top right on desktop, centred on the page on mobile) with caller "Agent", optional "VELIN NETWORK" label, "INCOMING HOLO CALL", signal bars, pulsing ring, large Accept. Shown on every visit, with no skip.
 3. **Connecting** - at most 1.5s of static, scanlines and RGB split, with "CONNECTING… ENCRYPTED LINK ESTABLISHED".
 4. **Agent materialises** - blob scales and fades in from a point of light, flickers once, settles into a slow idle morph.
 5. **Conversation** - chat with chips above the input; answers type out as streamed text with a soft glow.
@@ -197,7 +193,7 @@ Shown when every provider's allowance is used up, the visitor hits their rate li
 - Sound off by default.
 - Chat text meets WCAG AA contrast.
 - Keyboard operable, with a screen-reader-friendly transcript.
-- First meaningful interaction within ~3 seconds, or instantly via Skip.
+- First meaningful interaction within ~3 seconds.
 
 ## Deployment
 
