@@ -76,7 +76,7 @@ function parseMessages(body: unknown): ChatMessage[] | ChatError["error"] {
 
 function recentMessages(messages: ChatMessage[]) {
   const recent = messages.slice(-RECENT_MESSAGES);
-  return recent[0].role === "assistant" ? recent.slice(1) : recent;
+  return recent.slice(recent.findIndex(({ role }) => role === "user"));
 }
 
 /** Returns the next text chunk, or null at the end of the stream. */
