@@ -2,16 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const LINKS = [
-  { label: "PORTFOLIO", href: process.env.NEXT_PUBLIC_PORTFOLIO_URL },
-  { label: "LINKEDIN", href: process.env.NEXT_PUBLIC_LINKEDIN_URL },
-];
-
-const DETAILS =
-  "You can find Jonathan's full details on his portfolio or LinkedIn.";
-
-const CONTROL =
-  "border border-amber px-4 py-1 text-base font-semibold text-amber hover:bg-amber hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+import { CONTROL, ContactLinks, DETAILS } from "@/components/call/ContactLinks";
 
 interface SignalPanelProps {
   ended: boolean;
@@ -65,20 +56,7 @@ export function SignalPanel({ ended, retrying, onRetry }: SignalPanelProps) {
               RETRY
             </button>
           )}
-          {LINKS.map(
-            ({ label, href }) =>
-              href && (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={CONTROL}
-                >
-                  {label}
-                </a>
-              ),
-          )}
+          <ContactLinks />
         </div>
       </div>
     </div>

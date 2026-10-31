@@ -40,6 +40,8 @@
   --animate-connect-static: connect-static 0.4s steps(4) infinite;
   --animate-rgb-split: rgb-split 0.6s steps(1) infinite;
   --animate-chat-in: chat-in 0.4s ease-out 0.5s backwards;
+  --animate-call-collapse: call-collapse 0.4s ease-in forwards;
+  --animate-card-fade: chat-in 0.3s ease-out;
 
   @keyframes avatar-pulse {
     50% {
@@ -124,6 +126,14 @@
 
   @keyframes chat-in {
     from {
+      opacity: 0;
+    }
+  }
+
+  /* Clips for the same reason as avatar-materialise. */
+  @keyframes call-collapse {
+    to {
+      clip-path: inset(50% 0);
       opacity: 0;
     }
   }

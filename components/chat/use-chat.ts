@@ -44,6 +44,8 @@ export function useChat() {
 
       while (true) {
         const { done, value } = await reader.read();
+        // A chunk can resolve just before reset, and must not restore the answer.
+        if (controller.signal.aborted) return;
         if (done) break;
 
         answer += decoder.decode(value, { stream: true });
@@ -78,8 +80,15 @@ export function useChat() {
     return requestAnswer(messages);
   }
 
+  function reset() {
+    request.current?.abort();
+    setMessages([]);
+    setSignalLost(false);
+    setStatus("idle");
+  }
+
   const callEnded =
     status === "idle" && !signalLost && messages.length >= MAX_MESSAGES;
 
-  return { messages, status, signalLost, callEnded, send, retry };
+  return { messages, status, signalLost, callEnded, send, retry, reset };
 }

@@ -9,11 +9,18 @@ import { MAX_USER_CHARS } from "@/lib/chat/limits";
 
 import { SignalPanel } from "./SignalPanel";
 import { SuggestedQuestions } from "./SuggestedQuestions";
-import { useChat } from "./use-chat";
+import type { useChat } from "./use-chat";
 import { useTypedAnswer } from "./use-typed-answer";
 
-export function Chat({ connected }: { connected: boolean }) {
-  const { messages, status, signalLost, callEnded, send, retry } = useChat();
+interface ChatProps {
+  chat: ReturnType<typeof useChat>;
+  connected: boolean;
+  closing: boolean;
+  onEnd: () => void;
+}
+
+export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
+  const { messages, status, signalLost, callEnded, send, retry } = chat;
   const [input, setInput] = useState("");
   const transcript = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
@@ -62,6 +69,11 @@ export function Chat({ connected }: { connected: boolean }) {
     send(question);
   }
 
+  function endCall() {
+    setInput("");
+    onEnd();
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     submit();
@@ -77,15 +89,25 @@ export function Chat({ connected }: { connected: boolean }) {
 
   return (
     <main
-      className={`mx-auto flex h-dvh w-full max-w-4xl flex-col p-4 text-lg font-medium sm:p-6 ${connected ? "motion-safe:[&>:not([data-agent-avatar])]:animate-chat-in" : "invisible"}`}
+      inert={closing}
+      className={`mx-auto flex h-dvh w-full max-w-4xl flex-col p-4 text-lg font-medium sm:p-6 ${connected ? "motion-safe:[&>:not([data-agent-avatar])]:animate-chat-in" : "invisible"} ${closing ? "animate-call-collapse" : ""}`}
     >
       <p aria-hidden="true" className="text-xs text-alert">
         CHANNEL_HOLO_CALL
       </p>
-      <div className="cut-sm bg-frame p-px">
-        <h1 className="cut-sm bg-panel-from px-3 py-1 text-xl font-semibold text-accent sm:text-2xl">
-          HOLO CALL // AGENT
-        </h1>
+      <div className="flex items-stretch gap-2">
+        <div className="cut-sm min-w-0 flex-1 bg-frame p-px">
+          <h1 className="cut-sm bg-panel-from px-3 py-1 text-xl font-semibold text-accent sm:text-2xl">
+            HOLO CALL // AGENT
+          </h1>
+        </div>
+        <button
+          type="button"
+          onClick={endCall}
+          className="shrink-0 border border-amber px-3 text-base font-semibold text-amber hover:bg-amber hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:px-4"
+        >
+          END CALL
+        </button>
       </div>
 
       <AgentAvatar state={agentState} materialise={connected} />

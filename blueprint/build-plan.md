@@ -16,7 +16,7 @@ High-level features in rough build order. Run `/feature` to spec the next unchec
 - [x] 10. **Agent blob avatar** - Nyx UI Morphing Blob as Agent, with idle, ringing, thinking, speaking and signal-lost states; loaded in the browser only, with mobile, reduced-motion and no-WebGL fallbacks.
 - [x] 11. **Incoming call intro** - Caller card reading "Agent", Accept button, connecting glitch and the Agent blob materialising, before handing off to the chat.
 - [x] 12. **Intro controls** - A reduced-motion version of the intro. Every visit starts at the call screen with Accept.
-- [ ] 13. **End call** - Collapse the call and reset the conversation, then show contact links.
+- [x] 13. **End call** - Collapse the call and reset the conversation, then show contact links.
 - [ ] 14. **Contact links bar** - Persistent links to download the CV, LinkedIn, the portfolio and email.
 - [ ] 15. **Call sounds** - Optional ring and connect tones, muted by default, with a toggle.
 - [ ] 16. **Accessibility & mobile pass** - Keyboard use, screen-reader-friendly transcript, contrast checks and no harsh flashing.
