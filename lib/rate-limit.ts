@@ -6,17 +6,6 @@ const LIMITER_TIMEOUT_MS = 1_000;
 const url = process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-const limiter =
-  url && token
-    ? new Ratelimit({
-        redis: new Redis({ url, token }),
-        limiter: Ratelimit.slidingWindow(20, "10 m"),
-        prefix: "chat-rate-limit",
-        analytics: false,
-        timeout: LIMITER_TIMEOUT_MS,
-      })
-    : null;
-
 type RateLimitResult =
   | { allowed: true }
   | { allowed: false; retryAfterSeconds: number };
@@ -25,6 +14,26 @@ type RateLimitResult =
 function logSkipped(reason: string) {
   console.warn("Rate limit skipped", { reason });
 }
+
+function createLimiter() {
+  if (!url || !token) return null;
+
+  // Redis rejects a malformed URL here, at module load, outside checkRateLimit.
+  try {
+    return new Ratelimit({
+      redis: new Redis({ url, token }),
+      limiter: Ratelimit.slidingWindow(20, "10 m"),
+      prefix: "chat-rate-limit",
+      analytics: false,
+      timeout: LIMITER_TIMEOUT_MS,
+    });
+  } catch (error) {
+    logSkipped(error instanceof Error ? error.name : "UnknownError");
+    return null;
+  }
+}
+
+const limiter = createLimiter();
 
 /**
  * Checks the visitor's allowance. A limiter problem lets the request through,

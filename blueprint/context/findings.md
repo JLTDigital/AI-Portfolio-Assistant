@@ -47,14 +47,6 @@
 **Suggested fix:** Delete the `RetryError` import and the `cause` line, and read `statusCode` from the error itself. The replacement is the direct check already in `logFailure`. Current requirement lost: None. Do this together with F-03.
 **Resolution:** Re-review 2026-10-31 (independent, target 35b1daa): still open, code unchanged by this delta, now at line 127. Re-review 2026-10-31 (independent, target d952d8b): still open, logic unchanged, now at line 103. Repaired 2026-10-31 on fix/provider-failure-logs-lose-the-status-code: `logFailure` reads `statusCode` directly from `APICallError` or `StreamProviderError`, and the `RetryError` branch and import are gone. Under `next start` with a fake fetch, `429` and `500` logged `AI_APICallError` with those statuses, an in-band `{ error: { code: 503, message, status } }` logged `AI_StreamProviderError` with `503`, an empty answer logged `EmptyAnswer` with no status, and no visitor or provider message text appeared in the logs. An in-band error without `status` fails Google's schema and logs `AI_TypeValidationError` with no status code. Real providers not exercised.
 
-### F-09 [P3] open - A malformed Upstash URL throws instead of failing open
-
-**File:** lib/rate-limit.ts:12
-**Found:** 2026-10-31 by /audit independent (scope: current; lens: quality, security)
-**Why it matters:** The spec says a thrown error allows the request, but `new Redis` runs at module load, outside the `try` in `checkRateLimit`, and throws `UrlError` for a URL with no scheme or with a trailing space, a common paste mistake. Running the real route in-process with a stubbed `fetch`, the route module failed to load for both values, so no chat request could be served. `next build` with the no-scheme value and the variable in scope exits 1 ("Failed to collect configuration for /api/chat"), so a normal deploy stops rather than shipping the fault. That is why this is P3. The gap remains where the variable is absent at build time, and in `next dev`. A URL that passes the check but is wrong does fail open: `https://x y.io` logged `UpstashJSONParseError` and returned 200.
-**Suggested fix:** Decide which behaviour is wanted. Either build the limiter inside a `try` that logs `error.name` and leaves `limiter` null, or keep the build failure and record it in the spec as the accepted exception. The second removes no code but changes the spec, so it needs Jonathan's decision.
-**Resolution:**
-
 ### F-10 [P3] open - The real 429 path is not recorded as unexercised
 
 **File:** blueprint/context/current-feature.md:69
