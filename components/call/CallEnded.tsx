@@ -13,7 +13,7 @@ export function CallEnded({ onCallAgain }: { onCallAgain: () => void }) {
   }, []);
 
   return (
-    <main className="fixed inset-x-4 top-1/2 mx-auto max-w-sm -translate-y-1/2 animate-card-fade motion-reduce:animate-none">
+    <main className="fixed inset-x-4 top-1/2 mx-auto max-h-[calc(100dvh-2rem)] max-w-sm -translate-y-1/2 overflow-y-auto animate-card-fade motion-reduce:animate-none">
       <div className="cut-lg bg-frame p-px">
         <div className="cut-lg flex flex-col gap-4 bg-linear-to-br from-panel-from to-panel-to p-5 pb-8">
           <p aria-hidden="true" className="text-xs text-alert">

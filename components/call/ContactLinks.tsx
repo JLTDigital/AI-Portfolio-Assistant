@@ -7,7 +7,7 @@ export const DETAILS =
   "You can find Jonathan's full details on his portfolio or LinkedIn.";
 
 export const CONTROL =
-  "border border-amber px-4 py-1 text-base font-semibold text-amber hover:bg-amber hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "inline-flex min-h-11 items-center border border-amber px-4 py-1 text-base font-semibold text-amber hover:bg-amber hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 export function ContactLinks() {
   return LINKS.map(

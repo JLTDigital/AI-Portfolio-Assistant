@@ -12,6 +12,8 @@ import { SuggestedQuestions } from "./SuggestedQuestions";
 import type { useChat } from "./use-chat";
 import { useTypedAnswer } from "./use-typed-answer";
 
+const FOLLOW_DISTANCE_PX = 48;
+
 interface ChatProps {
   chat: ReturnType<typeof useChat>;
   connected: boolean;
@@ -25,6 +27,8 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
   const transcript = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
   const wasLocked = useRef(false);
+  const following = useRef(true);
+  const lastScrollTop = useRef(0);
 
   const { shownLength, typing } = useTypedAnswer(messages);
   const answering = status === "thinking" || status === "streaming" || typing;
@@ -37,6 +41,15 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
   else if (status === "streaming" || typing) agentState = "speaking";
   else if (locked) agentState = "signal-lost";
 
+  // Announced once, because the transcript itself isn't live: typing it out
+  // would read each character. A failed Retry is left to the panel's alert.
+  const last = messages[messages.length - 1];
+  let announcement = "";
+  if (status === "thinking" && !signalLost) announcement = "Agent is thinking";
+  else if (!answering && last?.role === "assistant") {
+    announcement = last.content;
+  }
+
   // The intro screen that held focus has just unmounted.
   useEffect(() => {
     if (connected) transcript.current?.focus();
@@ -44,8 +57,12 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
 
   // The panel takes height from the transcript, so its arrival also scrolls.
   useEffect(() => {
+    if (locked) following.current = true;
+  }, [locked]);
+
+  useEffect(() => {
     const element = transcript.current;
-    if (element) element.scrollTop = element.scrollHeight;
+    if (element && following.current) element.scrollTop = element.scrollHeight;
   }, [messages, status, locked, shownLength]);
 
   useEffect(() => {
@@ -53,12 +70,26 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
     wasLocked.current = locked;
   }, [locked]);
 
+  // An arrow key moves less than the follow distance, so any upward move lets
+  // go unless it only came from the content or the transcript resizing.
+  function handleScroll() {
+    const element = transcript.current;
+    if (!element) return;
+
+    const distance =
+      element.scrollHeight - element.scrollTop - element.clientHeight;
+    const movedUp = element.scrollTop < lastScrollTop.current;
+    following.current = distance < (movedUp ? 1 : FOLLOW_DISTANCE_PX);
+    lastScrollTop.current = element.scrollTop;
+  }
+
   function submit() {
     const question = input.trim();
     if (!question || answering || locked) return;
 
     setInput("");
     field.current?.focus();
+    following.current = true;
     send(question);
   }
 
@@ -66,6 +97,7 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
   // transcript takes it because focusing the input opens the mobile keyboard.
   function askSuggested(question: string) {
     transcript.current?.focus();
+    following.current = true;
     send(question);
   }
 
@@ -97,14 +129,17 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
       </p>
       <div className="flex items-stretch gap-2">
         <div className="cut-sm min-w-0 flex-1 bg-frame p-px">
-          <h1 className="cut-sm bg-panel-from px-3 py-1 text-xl font-semibold text-accent sm:text-2xl">
+          <h1
+            aria-label="Holo call with Agent"
+            className="cut-sm bg-panel-from px-3 py-1 text-xl font-semibold text-accent sm:text-2xl"
+          >
             HOLO CALL // AGENT
           </h1>
         </div>
         <button
           type="button"
           onClick={endCall}
-          className="shrink-0 border border-amber px-3 text-base font-semibold text-amber hover:bg-amber hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:px-4"
+          className="min-h-11 shrink-0 border border-amber px-3 text-base font-semibold text-amber hover:bg-amber hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:px-4"
         >
           END CALL
         </button>
@@ -124,10 +159,10 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
         <div className="cut-lg flex min-w-0 flex-1 flex-col gap-3 bg-linear-to-br from-panel-from to-panel-to p-3 pb-6 sm:gap-4 sm:p-6 sm:pb-8">
           <div
             ref={transcript}
-            role="log"
+            role="region"
             aria-label="Conversation with Agent"
-            aria-busy={answering}
             tabIndex={0}
+            onScroll={handleScroll}
             className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1 focus-visible:outline-2 focus-visible:outline-accent"
           >
             {messages.length === 0 && (
@@ -164,6 +199,10 @@ export function Chat({ chat, connected, closing, onEnd }: ChatProps) {
               </p>
             )}
           </div>
+
+          <p role="status" className="sr-only">
+            {announcement}
+          </p>
 
           {locked && (
             <SignalPanel

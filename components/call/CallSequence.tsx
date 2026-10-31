@@ -52,7 +52,7 @@ export function CallSequence() {
   // Chat stays mounted but invisible from the start: WebGL startup blocks the
   // main thread, so it has to happen before anything needs to animate.
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-dvh min-h-[36rem] flex-col">
       {stage === "ringing" && <IncomingCall onAccept={accept} />}
       {stage === "connecting" && <Connecting />}
       {stage === "ended" && <CallEnded onCallAgain={accept} />}

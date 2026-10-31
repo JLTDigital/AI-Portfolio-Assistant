@@ -15,7 +15,7 @@ export function SuggestedQuestions({ onSelect }: SuggestedQuestionsProps) {
   return (
     <ul
       aria-label="Suggested questions"
-      className="flex shrink-0 gap-2 overflow-x-auto p-1 [scrollbar-width:thin] sm:flex-wrap sm:overflow-visible sm:p-0"
+      className="flex shrink-0 gap-2 overflow-x-auto p-1 [scrollbar-width:thin] sm:[@media(min-height:640px)]:flex-wrap sm:[@media(min-height:640px)]:overflow-visible sm:[@media(min-height:640px)]:p-0"
     >
       {QUESTIONS.map((question) => (
         <li key={question} className="shrink-0">

@@ -2,7 +2,7 @@ const SIGNAL_BARS = ["h-2", "h-4", "h-6", "h-8"];
 
 export function IncomingCall({ onAccept }: { onAccept: () => void }) {
   return (
-    <main className="fixed inset-x-4 top-1/2 mx-auto max-w-sm -translate-y-1/2 animate-card-in motion-reduce:animate-none sm:top-6 sm:right-6 sm:left-auto sm:mx-0 sm:w-full sm:translate-y-0">
+    <main className="fixed inset-x-4 top-1/2 mx-auto max-h-[calc(100dvh-2rem)] max-w-sm -translate-y-1/2 overflow-y-auto animate-card-in motion-reduce:animate-none sm:top-6 sm:right-6 sm:left-auto sm:mx-0 sm:w-full sm:translate-y-0">
       <div className="cut-lg bg-frame p-px">
         <div className="cut-lg flex flex-col gap-4 bg-linear-to-br from-panel-from to-panel-to p-5 pb-8">
           <p aria-hidden="true" className="text-xs text-alert">
