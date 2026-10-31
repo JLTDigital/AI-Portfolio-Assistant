@@ -151,7 +151,7 @@ A cyberpunk holo call inspired by, not copied from, the Cyberpunk 2077 UI. Dark,
 ### Flow
 
 1. **Scene** - near-black page with faint grid lines and scanlines.
-2. **Incoming call** - compact card slides in (top right on desktop, centred on the page on mobile) with caller "Agent", optional "VELIN NETWORK" label, "INCOMING HOLO CALL", signal bars, pulsing ring, large Accept. Shown on every visit, with no skip.
+2. **Incoming call** - compact card slides in, centred on the page, with caller "Agent", optional "VELIN NETWORK" label, "INCOMING HOLO CALL", signal bars, pulsing ring, large Accept. Shown on every visit, with no skip.
 3. **Connecting** - at most 1.5s of static, scanlines and RGB split, with "CONNECTING… ENCRYPTED LINK ESTABLISHED".
 4. **Agent materialises** - blob scales and fades in from a point of light, flickers once, settles into a slow idle morph.
 5. **Conversation** - chat with chips above the input; answers type out as streamed text with a soft glow.
