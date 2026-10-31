@@ -2,6 +2,8 @@
 
 A cyberpunk "holo call" that answers questions about Jonathan Taft. Visitors accept an incoming call from Agent, Jonathan's AI agent, and ask about his skills, experience and projects. Agent answers only from his CV, LinkedIn and portfolio content.
 
+**[Take the call](https://ai-portfolio-assistant-delta-nine.vercel.app/)**
+
 A CV can't answer follow-up questions, and recruiters rarely have time to dig through a portfolio. Holo Call gives them specific answers on demand, and the app itself is a working example of Jonathan's front-end, animation and AI integration skills.
 
 ![The Holo Call chat screen, with Agent's animated orb above suggested questions and a message box](docs/screenshot.png)
