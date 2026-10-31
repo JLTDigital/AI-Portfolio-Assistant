@@ -22,5 +22,5 @@ High-level features in rough build order. Run `/feature` to spec the next unchec
 - [x] 16. **Accessibility & mobile pass** - Keyboard use, screen-reader-friendly transcript, contrast checks and no harsh flashing.
 - [x] 17. **Privacy note & share metadata** - A one-line AI privacy note, page metadata, and an Open Graph image of the holo-call card for LinkedIn previews.
 - [x] 18. **Health check** - An `/api/health` endpoint reporting app status and whether each provider can be reached.
-- [ ] 19. **CV import script** - `npm run import:cv` converts an updated .docx or .pdf CV into `content/cv.md` for review.
+- [x] 19. **CV import script** - `npm run import:cv` converts an updated .docx or .pdf CV into `content/cv.md` for review.
 - [ ] 20. **Portfolio import script** - Fetches the live portfolio site and drafts `content/portfolio.md` for review.

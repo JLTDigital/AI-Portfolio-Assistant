@@ -8,7 +8,8 @@
     "prebuild": "node scripts/build-knowledge.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "import:cv": "node scripts/import-cv.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.109",
@@ -33,7 +34,10 @@
     "@types/three": "^0.186.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "mammoth": "^1.13.0",
+    "pdfjs-dist": "^6.4.299",
     "tailwindcss": "^4",
+    "turndown": "^7.2.4",
     "typescript": "^5"
   }
 }

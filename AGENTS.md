@@ -88,6 +88,7 @@ Skills: `adopt`, `audit`, `blueprint-doctor`, `blueprint-status`, `brief`,
 - Build: `npm run build`
 - Production server: `npm run start` (after a build)
 - Lint: `npm run lint`
+- CV import: `npm run import:cv -- path/to/cv.docx` (or `.pdf`) drafts `content/cv.md` for review
 
 No test, typecheck, or Verify command is configured, so tests are not a gate yet.
 

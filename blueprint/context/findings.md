@@ -62,3 +62,19 @@
 **Why it matters:** Step 3 says that without credentials the 429 path must be recorded as not exercised, and the Testing section repeats it. The local `.env` has neither `UPSTASH_REDIS_REST_URL` nor `UPSTASH_REDIS_REST_TOKEN` (names checked, no values read out), yet step 3 is checked, the status is `verified`, and neither the spec nor the commit message records this. The route logic itself is sound: against a fake Redis this review saw the 21st request return 429 with `Retry-After` and no provider call. Real Upstash has still never been exercised, and the limiter stays off in production until the variables are set in Vercel.
 **Suggested fix:** Add credentials and run the step 3 check, or add one line to the spec saying the 429 path was not exercised live, then confirm the limiter works in the deployed environment.
 **Resolution:** Evidence added 2026-10-31: with real Upstash credentials and stubbed providers, requests 1-20 returned 200, 21 and 22 returned 429 `rate_limited` with `Retry-After`, and a later over-long request returned 400. Provider calls: 20. Status left open for a review pass.
+
+### F-11 [P3] open - A dropped image leaves empty markdown behind
+
+**File:** scripts/import-cv.mjs:22
+**Found:** 2026-10-31 by /audit independent (scope: current; lens: quality)
+**Why it matters:** The spec says DOCX conversion drops images, and the `dropImages` rule removes the image but not its wrapper. A throwaway `.docx` produced `[](https://jlt.digital/)` from an image inside a link, `## ` from an image in a heading, and `-` from an image in a list item. Linked social icons are common on CVs. The URL survives, but as a link with no text, and it reaches the system prompt that way unless removed. The review reminder asks Jonathan to read the draft, so this is cleanup, not data loss. No base64 or image text survived.
+**Suggested fix:** After Turndown, strip empty links and then lines holding only a heading or bullet marker, for example `.replace(/\[\]\([^)]*\)/g, "").replace(/^[ \t]*(#{1,6}|-)[ \t]*$/gm, "")`.
+**Resolution:**
+
+### F-12 [P3] open - A relative path resolves from the project root, not the current folder
+
+**File:** scripts/import-cv.mjs:103
+**Found:** 2026-10-31 by /audit independent (scope: current; lens: quality)
+**Why it matters:** The contract says the path resolves from the current working directory, but `npm run` changes the working directory to the project root before Node starts. From `content/`, `npm run import:cv -- sub-only-here.pdf` failed with `file not found` for a path at the project root, although the file was in the current folder. It fails safely and prints the full path, and absolute paths and runs from the root work. A same-named file at the root would be imported in its place, though the draft is still reviewed.
+**Suggested fix:** Use `resolve(process.env.INIT_CWD ?? process.cwd(), args[0])`, which npm sets to the folder the command was run from.
+**Resolution:**
